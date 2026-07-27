@@ -138,6 +138,12 @@ async function loadProfileData(){
       const hours = Math.round((p.chat_minutes || 0) / 60 * 10) / 10;
       document.getElementById('stat-chat-hours').textContent = hours.toLocaleString('cs-CZ');
 
+      // v28a - "Moje statistiky": herní/event/media čísla, počítá je
+      // GET /profile/me přímo (viz app/routers/profile.py).
+      document.getElementById('stat-games-count').textContent = (p.games_count || 0).toLocaleString('cs-CZ');
+      document.getElementById('stat-events-count').textContent = (p.events_count || 0).toLocaleString('cs-CZ');
+      document.getElementById('stat-media-count').textContent = (p.media_count || 0).toLocaleString('cs-CZ');
+
       // v29 - vzdělání/náboženství/sexuální preference (O mně) + telefon (Kontaktní údaje)
       document.getElementById('info-education').textContent = 'Vzdělání: ' + (p.education || 'nechci uvádět');
       document.getElementById('info-religion').textContent = 'Náboženství: ' + (p.religion || 'nechci uvádět');
@@ -146,6 +152,9 @@ async function loadProfileData(){
         document.getElementById('info-sexual-preference-row').style.display = '';
       }
       document.getElementById('info-phone').textContent = p.phone ? p.phone : 'Telefon zatím nevyplněn';
+
+      // v27 backend (lokality) + backlog bod 4 (UI) - viz profil-locations.js
+      renderLocationsList(p.locations || []);
     }
 
     if(walletRes.ok){

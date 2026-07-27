@@ -47,16 +47,15 @@
 - [ ] **Backend & Logic:**
   - Automatické vytvoření příspěvku (Post) na zdi s navázanými nahrávanými médii a tagy uživatelů/místa + vyvolání notifikací pro označené osoby.
 
-### 4. 📍 Dokončení správy lokalit na profilu (`Profile Locations`)
-*Cíl: Rozšíření jednoplátkového pole adresy na plnohodnotnou správu až 3 lokalit uživatele.*
-- [ ] **UI & Formátování na profilu:**
-  - Nahradit jedno pole pro adresu formulářem/rozhraním pro **až 3 lokality** (Lokalita 1, Lokalita 2, Lokalita 3).
-  - Každá lokalita bude obsahovat:
-    - **Název lokality** (např. *Domov*, *Práce*, *Chata na horách*).
-    - **Adresu / Místo**.
-    - **Popis lokality** (doplňující text/poznámka).
-- [ ] **Backend napojení:**
-  - Úprava datového modelu profilu / citlivých údajů pro uložení strukturovaného pole lokalit.
+### 4. ✅ Dokončení správy lokalit na profilu (`Profile Locations`)
+*Hotovo — přesunuto z backlogu, viz DEVLOG #051. Backend (`ProfileLocation`
+model, `GET/POST/PUT/DELETE /profile/me/locations`) existoval už z v27,
+chybělo jen UI na vlastním profilu.*
+- [x] **UI & Formátování na profilu:**
+  - `frontend/layout-user-profil.html` — sekce "Lokality" v kartě "O mně" (nahradila placeholder "Lokace a zájmy — brzy"), nový modal pro přidání/úpravu.
+  - Nový `frontend/profil-locations.js` — CRUD napojený na `/profile/me/locations`, limit **3 lokalit** vynucen frontendem (backend limit nemá).
+  - Každá lokalita: **Název** (label), **Město** (povinné), **Země** (nepovinné), **Popis** (nepovinné).
+- [x] **Backend napojení:** Nebylo potřeba — `ProfileLocation` + CRUD endpointy už existovaly z v27 (kvůli zobrazení na veřejném profilu).
 
 ### 5. 💬 Systém lajků a komentářů u médií
 *Cíl: Chybějící backend pro interakce s médii (viz DEVLOG backlog).*

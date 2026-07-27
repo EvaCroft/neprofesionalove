@@ -103,6 +103,15 @@ class ProfileOut(BaseModel):
     profile_views_count: int = 0
     chat_minutes: int = 0
 
+    # v28a - "Moje statistiky": rozšíření o herní/event/media čísla.
+    # Transientní (nepersistované) hodnoty - dopočítávají se v
+    # app/routers/profile.py:read_my_profile z existujících tabulek
+    # games/events/media, žádná nová DB kolonka. Pro cizí profil
+    # (read_public_profile) se nepočítají a zůstávají na výchozí 0.
+    games_count: int = 0
+    events_count: int = 0
+    media_count: int = 0
+
     class Config:
         from_attributes = True
 

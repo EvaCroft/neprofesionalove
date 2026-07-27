@@ -1,33 +1,46 @@
 # DEVLOG (Active) – Neprofesionálové
 
 **Projekt:** Neprofesionálové  
-**Aktuální verze:** v29 ✅ HOTOVO (staticky ověřeno) — Osobní údaje & zabezpečené kontakty (zařazeno mimo pořadí).  
+**Aktuální verze:** v28a ✅ HOTOVO — Moje statistiky (herní/event/media čísla).  
 **Stav bloku Profil/Vztahy:**
-- **v27 🔄 AKTIVNÍ / ROZPRACOVÁNO:** "O mně" + Přátelé na VLASTNÍM profilu hotovo (#048). **Zbývá:** samostatný veřejný profil (`layout-profil-verejny.html`) + akční tlačítka Přidat do přátel / Sledovat.
-- **v28 🔄 NEZAHÁJENO:** "Moje statistiky" + komunitní widgety na Přehledu.
+- **v27 ✅ HOTOVO:** "O mně" + Přátelé na VLASTNÍM profilu (#048). Veřejný profil `layout-profil-verejny.html` + `profil-verejny.js` (kostra, napojení na data, skrytí `ALWAYS_PRIVATE_FIELDS`, tlačítka Přidat do přátel / Sledovat) — v27a/b/c dokončeny v jednom kroku, backend endpointy (`friends.py`, `profile.py`) už existovaly, žádná backend úprava nebyla potřeba (#050).
+- **v28a ✅ HOTOVO:** "Statistiky" → "Moje statistiky" + herní/event/media čísla (#052).
+- **v28b 🔄 NEZAHÁJENO:** Komunitní widgety na Přehledu.
 - **v29 ✅ HOTOVO:** Osobní údaje (vzdělání, náboženství, sexuální preference) + kontakty přes `PUT /profile/me/sensitive` chráněné heslem (#049).
 
 **Stav bloku Frontend / Design:**
-- Hotové reálné stránky: `layout-dashboard.html`, `layout-auth.html`, `layout-user-profil.html`, `layout-wall.html`, `layout-media-galerie.html`.
-- **Zbývá / Další krok:** 1. Dokončení v27 – vytvoření `layout-profil-verejny.html`.
-  2. Dokončení v28 – Moje statistiky & widgety.
-  3. Frontend pro Chat místnosti + Messenger (`layout-chat-mistnost.html`, `layout-messenger.html`).
+- Hotové reálné stránky: `layout-dashboard.html`, `layout-auth.html`, `layout-user-profil.html`, `layout-wall.html`, `layout-media-galerie.html`, `layout-profil-verejny.html`.
+- **Zbývá / Další krok:** 1. v28b – Komunitní widgety na Přehledu.
+  2. Frontend pro Chat místnosti + Messenger (`layout-chat-mistnost.html`, `layout-messenger.html`).
 
 ---
 
 ## 1. Aktuální rozpracované úkoly (Context pro další session)
 
-### Rozpracováno: v27 – Veřejný profil (`layout-profil-verejny.html`)
-- **Stav:** Na vlastním profilu jsou sekce "O mně", presence i přátelé zapojené (#048).
-- **Cíl:** Vytvořit samostatný soubor `layout-profil-verejny.html` pro prohlížení cizího profilu.
-- **Požadavky:**
-  - Napojení na `GET /profile/{id}` a `GET /friends/status/{id}`.
-  - Tlačítka **Přidat do přátel** / **Sledovat** (využívající již hotové backend endpointy z v24).
-  - Skrytí citlivých polí (`ALWAYS_PRIVATE_FIELDS`: e-maily, telefony, adresa, datum narození).
+### ✅ Dokončeno: v27 – Veřejný profil (`layout-profil-verejny.html`) (#050)
+- **Stav:** Hotovo, v27a/b/c dokončeny naráz.
+- Nový `frontend/layout-profil-verejny.html` (kostra podle `layout-user-profil.html`) + nový `frontend/profil-verejny.js` (vlastní modul, nezasahuje do `profil-core.js`).
+- Napojení na `GET /profile/{id}`, `GET /profile/{id}/presence`, `GET /friends/counts/{id}` (guest-friendly) a `GET /friends/status/{id}` (jen přihlášení).
+- Tlačítka **Přidat do přátel** / **Sledovat** volají existující v24 endpointy (`/friends/request`, `/accept`, `/cancel`, `/decline`, `/{id}`, `/follow/{id}`).
+- `ALWAYS_PRIVATE_FIELDS` (e-maily, telefony, adresa, datum narození) ověřeny — filtrují se už v `app/routers/profile.py:read_public_profile`, frontend s nimi vůbec nepočítá.
+- Žádná backend úprava nebyla potřeba — všechny použité endpointy už existovaly z v24/v26.
 
 ### Zabezpečení a citlivá data (v29 Summary)
 - `PUT /profile/me/sensitive` vyžaduje `current_password`. Mění: `email_secondary`, `phone_secondary`, `birth_date`, `address`.
 - Konstanta `ALWAYS_PRIVATE_FIELDS` na backendu striktně blokuje veřejné čtení těchto 4 polí.
+
+### ✅ Dokončeno: Správa lokalit na vlastním profilu (backlog bod 4, #051)
+- Backend (`app/models/profile_location.py`, `GET/POST/PUT/DELETE /profile/me/locations`) existoval už z v27 kvůli zobrazení lokalit na veřejném profilu — chybělo jen UI pro správu na vlastním profilu.
+- Nové: sekce "Lokality" v kartě "O mně" na `layout-user-profil.html` (nahradila placeholder), modal pro přidání/úpravu, nový `frontend/profil-locations.js`.
+- Limit **3 lokalit** (label + město + země + popis) vynucen frontendem — backend limit nemá.
+
+### ✅ Dokončeno: v28a – Moje statistiky (#052)
+- "Statistiky" → "Moje statistiky" na `layout-user-profil.html`.
+- `GET /profile/me` rozšířen o `games_count`, `events_count`, `media_count` — transientní (nepersistované) atributy dopočítané v `read_my_profile()`, čtou jen existující tabulky `games`/`event_participations`/`media_assets`, žádná DB migrace.
+  - `games_count`: dokončené (`FINISHED`) hry, kde uživatel hrál přímo (`player1_id`/`player2_id`) nebo jako člen týmu (`GameTeamPlayer`), distinct.
+  - `events_count`: distinct událostí s jakoukoliv účastí (`GOING`/`INTERESTED`/`WENT`).
+  - `media_count`: veškerá média nahraná uživatelem (`MediaAsset.owner_id`), bez ohledu na zdroj.
+- Cizí (veřejný) profil tato čísla nepočítá, zůstávají na výchozí 0 — smysl dávají jen na vlastním profilu.
 
 ---
 

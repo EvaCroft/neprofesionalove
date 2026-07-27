@@ -151,14 +151,19 @@ se jich jen úkoly, které mění autentizaci, práva nebo routing napříč app
 - `frontend/profil-events.js`
 - `frontend/profil-media.js`
 - `frontend/profil-contact.js`
+- `frontend/profil-locations.js` (správa vlastních lokalit — max 3, backend
+  z v27 přes `app/routers/profile.py:/me/locations`)
 - `frontend/profil-wall-activity.js`
 - `frontend/profil.css`
 - → **vzorový modulární rozpad, používat i jinde**
 
-### Veřejný profil (TBD — v27)
-- `frontend/layout-profil-verejny.html` (zatím neexistuje)
-- nový `frontend/profil-verejny.js` (doporučeno založit rovnou zvlášť,
-  ne dopisovat do `profil-core.js`)
+### Veřejný profil (v27 ✅ hotovo)
+- `frontend/layout-profil-verejny.html`
+- `frontend/profil-verejny.js` (vlastní modul, odděleně od `profil-core.js`)
+- backend: `app/routers/profile.py` (`GET /profile/{id}`, `/presence`,
+  `ALWAYS_PRIVATE_FIELDS` filtrace), `app/routers/friends.py`
+  (`GET /friends/counts/{id}`, `GET /friends/status/{id}`, akční endpointy
+  z v24) — vše už existovalo, nová featura je čistě frontendová.
 
 ### Zeď (Wall)
 - `frontend/layout-wall.html` (97 řádků inline JS)

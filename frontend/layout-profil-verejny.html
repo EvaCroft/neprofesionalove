@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<!-- Template: moonGlass-v1 (glass/Apple-styl vizuální design appky Neprofesionálové) -->
+<!-- v27b — napojení kostry (v27a) na GET /profile/{id} + GET /profile/{id}/presence.
+     ALWAYS_PRIVATE_FIELDS (birth_date, address, email_secondary, phone_secondary)
+     se filtrují už na backendu (app/routers/profile.py:read_public_profile) -
+     frontend s nimi vůbec nepracuje, viz profil-verejny.js.
+     Akční tlačítka (Přidat do přátel / Sledovat) dostanou logiku ve v27c. -->
+<html lang="cs" data-template="moonGlass-v1"><head><meta charset="UTF-8"><title>Neprofesionálové — Veřejný profil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="profil.css">
+</head><body data-mode="light">
+<div class="orb"></div>
+<div class="app-header">
+
+<div class="topbar">
+  <div class="panel-brand">
+    <div class="brand-row"><span class="brand">Neprofesionálové</span><span class="badge">v0.1 · MVP</span></div>
+    <div class="stat-ticker"><div class="stat-item"><span class="dotc dot-green"></span>21 830 přihlášených</div></div>
+  </div>
+
+  <div class="panel-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" placeholder="Hledat…">
+  </div>
+
+  <div class="panel-quick">
+    <button class="icon-btn" title="Spustit stream" aria-label="Spustit stream">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-4v12l-6-4z"/></svg>
+    </button>
+    <button class="icon-btn" title="Knihovna médií" aria-label="Knihovna médií">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M3 13l4-4 3 3 5-5 6 6"/><circle cx="8" cy="8" r="1.3"/></svg>
+    </button>
+    <button class="icon-btn" title="Skupiny" aria-label="Skupiny">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><path d="M15.5 14.3c2.7.5 5 2.6 5 5.7"/></svg>
+    </button>
+  </div>
+
+  <div class="panel-icons">
+    <button class="icon-btn" aria-label="Notifikace">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Zprávy">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Uživatelské menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="page-nav-container"><div class="page-nav-inner">
+  <a href="layout-user-profil.html">Profil</a><a href="layout-wall.html">Zeď</a>
+  <a href="layout-messenger.html">Zprávy</a>
+  <a class="soon" href="#">Peněženka (brzy)</a>
+  <a href="layout-media-galerie.html">Média</a>
+  <a href="layout-chat-mistnost.html">Chat</a>
+  <a class="soon" href="#">Klubovny (brzy)</a>
+  <a class="soon" href="#">Události (brzy)</a>
+  <a class="soon" href="#">Hry (brzy)</a>
+</div></div>
+</div>
+
+<main>
+
+<!-- Načítání — profil-verejny.js přepíná mezi loading/content/error -->
+<div id="profile-loading" style="text-align:center;padding:60px 20px;color:var(--text-2);font-size:.85rem;">Načítám profil…</div>
+
+<div id="profile-error" style="display:none;text-align:center;padding:60px 20px;">
+  <h4 style="margin-bottom:8px;">Profil nenalezen</h4>
+  <p style="color:var(--text-2);font-size:.85rem;">Tento profil neexistuje nebo byl odstraněn.</p>
+</div>
+
+<div id="profile-content" style="display:none;">
+
+<!-- COVER + HLAVIČKA — bez editačních prvků (cizí profil se nedá upravovat) -->
+<div class="profile-cover" id="pv-cover"></div>
+
+<div class="profile-head">
+  <div class="profile-avatar" id="pv-avatar"></div>
+
+  <div class="profile-head-info">
+    <h1><span id="pv-name">—</span></h1>
+    <div class="profile-handle" id="row-handle" style="display:none;"><span id="pv-handle"></span></div>
+    <p class="profile-bio" id="pv-header-bio"></p>
+    <span id="pv-followed-by-badge" style="display:none;font-size:.72rem;color:var(--text-2);margin-top:4px;">Sleduje vás</span>
+  </div>
+
+  <div class="profile-actions">
+    <button class="profile-btn primary" id="btn-friend">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+      <span class="btn-label">Přidat do přátel</span>
+    </button>
+    <button class="profile-btn ghost" id="btn-follow">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      <span class="btn-label">Sledovat</span>
+    </button>
+    <button class="profile-btn icon-only" title="Napsat zprávu" aria-label="Napsat zprávu">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </button>
+  </div>
+  <!-- POZN.: zpráva zůstává bez akce - Messenger frontend zatím neexistuje
+       (viz CONTEXT-MAP), mimo rozsah v27c. -->
+</div>
+
+<div class="profile-split">
+
+  <!-- LEVÝ SLOUPEC -->
+  <div class="profile-side">
+
+    <div class="card">
+      <h3>O uživatelce</h3>
+      <div class="info-row" id="row-city" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0114 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        <span id="pv-city"></span>
+      </div>
+      <div class="info-row" id="row-presence" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span id="pv-presence"></span>
+      </div>
+    </div>
+
+    <!-- Reálná data z GET /friends/counts/{id} (guest-friendly, v24) - v27c.
+         Odznaky/eventy/média zatím nemají obdobný veřejný count endpoint,
+         zůstávají v samostatné kartě níž jako "zatím nenapojeno". -->
+    <div class="card">
+      <h3>Statistiky</h3>
+      <div class="mini-stats">
+        <div class="mini-stat"><b id="pv-friends-count">—</b><span>Přátelé</span></div>
+        <div class="mini-stat"><b id="pv-followers-count">—</b><span>Sledující</span></div>
+        <div class="mini-stat"><b id="pv-following-count">—</b><span>Sleduje</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Odznaky</h3>
+      <p class="activity-empty">Odznaky zatím nejsou napojené na veřejný profil.</p>
+    </div>
+
+  </div>
+
+  <!-- HLAVNÍ SLOUPEC -->
+  <div style="flex:1;min-width:0;">
+
+    <div class="profile-tabs">
+      <a class="active">O mně</a>
+      <a>Zeď</a>
+      <a>Média</a>
+      <a>Přátelé</a>
+    </div>
+
+    <div class="tab-panel active">
+      <div class="card">
+        <h3>O mně</h3>
+        <p class="profile-bio" id="pv-about-bio" style="max-width:none;"></p>
+
+        <div style="margin-top:10px;">
+          <div class="info-row" id="row-orientation" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>
+            <span id="pv-orientation"></span>
+          </div>
+          <div class="info-row" id="row-relationship" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 10-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+            <span id="pv-relationship"></span>
+          </div>
+          <div class="info-row" id="row-seeking" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <span id="pv-seeking"></span>
+          </div>
+          <div class="info-row" id="row-education" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>
+            <span id="pv-education"></span>
+          </div>
+          <div class="info-row" id="row-religion" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 8h14"/></svg>
+            <span id="pv-religion"></span>
+          </div>
+          <div class="info-row" id="row-hobbies" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 17l-6.2 3.4 1.6-6.8L2.2 9l6.9-.7z"/></svg>
+            <span id="pv-hobbies"></span>
+          </div>
+        </div>
+
+        <!-- Rozšiřitelný seznam lokací (ProfileLocation, v27) - vyplní JS -->
+        <div id="pv-locations" style="margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <!-- Zeď/Média/Přátelé zůstávají zatím statická ukázka - napojení na
+         posts_service.py / media.py / friends.py je mimo rozsah v27b
+         (jiné featury, viz CONTEXT-MAP). -->
+    <div class="tab-panel">
+      <div class="card">
+        <h3>Zeď</h3>
+        <div class="post">
+          <div class="post-head">
+            <div class="avatar-sm"></div>
+            <div><b>—</b><span>před 3 dny</span></div>
+          </div>
+          <p class="post-text">Krásný víkend všem! 🌞</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel">
+      <div class="card">
+        <div class="section-head"><h3>Média</h3><a class="section-link" href="#">Zobrazit vše</a></div>
+        <div class="photo-grid preview">
+          <div class="photo-tile"></div><div class="photo-tile"></div>
+          <div class="photo-tile"></div><div class="photo-tile"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel">
+      <div class="card">
+        <h3>Přátelé</h3>
+        <p class="activity-empty">Seznam přátel zatím není napojen na veřejný profil.</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</div><!-- /#profile-content -->
+
+</main>
+
+<script src="profil-verejny.js"></script>
+</body></html>
