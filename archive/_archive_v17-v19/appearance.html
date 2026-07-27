@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neprofesionálové — Nastavení vzhledu</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  #control-panel {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 300px;
+    overflow-y: auto; z-index: 100;
+    border-left: 1px solid var(--color-border);
+    background: var(--color-surface);
+    padding: var(--space-md);
+  }
+  .preview-wrap { margin-right: 300px; min-height: 100vh; }
+  .preview-wrap .app-shell { min-height: 100vh; }
+
+  .panel-heading { margin: 0 0 var(--space-sm) 0; font-size: var(--font-size-lg); }
+  .slider-row { display: flex; flex-direction: column; gap: var(--space-xs); margin-bottom: var(--space-md); }
+  .slider-row label { display: flex; justify-content: space-between; font-size: var(--font-size-sm); color: var(--color-text-muted); }
+  .slider-row input[type=range] { width: 100%; accent-color: var(--color-primary); }
+  .layout-choice { display: flex; flex-direction: column; gap: var(--space-xs); margin-bottom: var(--space-lg); }
+  .layout-choice button {
+    text-align: left;
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm);
+    cursor: pointer;
+    font-size: var(--font-size-base);
+  }
+  .layout-choice button.active { border-color: var(--color-primary); background: var(--color-primary); color: #fff; }
+  .preview-card { padding: var(--space-md); margin-bottom: var(--space-md); }
+  .preview-card h3 { margin: 0 0 var(--space-xs) 0; font-size: var(--font-size-base); }
+  #reset-btn { margin-top: var(--space-sm); }
+
+  /* demo obsah uvnitř app-sidebar / app-menu / kanban / magazine — jen ukázka, ne skutečné ovládání */
+  .demo-list-item { padding: var(--space-sm); border-bottom: 1px solid var(--color-border); font-size: var(--font-size-sm); }
+  .demo-list-item.active { border-left: 3px solid var(--color-primary); background: var(--color-bg); }
+  .kanban-board { display: flex; gap: var(--space-md); overflow-x: auto; height: 100%; align-items: flex-start; }
+  .kanban-column { min-width: 240px; flex: 0 0 auto; background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-sm); }
+  .kanban-column h4 { margin: 0 0 var(--space-sm) 0; font-size: var(--font-size-sm); color: var(--color-text-muted); }
+  .kanban-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: var(--space-sm); margin-bottom: var(--space-sm); font-size: var(--font-size-sm); }
+  .magazine-hero {
+    border-radius: var(--radius-lg); padding: var(--space-xl); margin-bottom: var(--space-md);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-surface)); color: #fff;
+  }
+  .magazine-hero h2 { margin: 0 0 var(--space-xs) 0; font-size: var(--font-size-xl); }
+  .magazine-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-md); }
+  .magazine-grid .surface { padding: var(--space-sm); }
+</style>
+</head>
+<body class="layout-sidebar-left">
+
+  <div id="control-panel">
+    <h2 class="panel-heading">Layout</h2>
+    <div class="layout-choice" id="layout-choice"></div>
+
+    <h2 class="panel-heading">Vzhled (realtime)</h2>
+    <div id="sliders"></div>
+
+    <button class="btn" id="reset-btn">Obnovit výchozí</button>
+  </div>
+
+  <div class="preview-wrap">
+    <div class="app-shell">
+      <nav class="app-menu" id="app-menu">
+        <strong>N.</strong>
+      </nav>
+
+      <div class="app-topbar" id="app-topbar">
+        <span class="muted">🔍</span>
+        <span class="muted">🔔</span>
+        <span class="feed-card-avatar" style="width:32px;height:32px;"></span>
+      </div>
+
+      <aside class="app-sidebar" id="app-sidebar"></aside>
+
+      <main class="app-content" id="app-content"></main>
+
+      <div class="app-floating-nav" id="app-floating-nav">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-icon">🔍</span>
+        <span class="nav-icon primary">+</span>
+        <span class="nav-icon">🔔</span>
+        <span class="nav-icon">👤</span>
+      </div>
+    </div>
+  </div>
+
+<script src="theme.js"></script>
+<script>
+(function () {
+  var state = NeprofTheme.init();
+
+  function renderLayoutChoices() {
+    var wrap = document.getElementById("layout-choice");
+    wrap.innerHTML = "";
+    NeprofTheme.LAYOUTS.forEach(function (layout) {
+      var btn = document.createElement("button");
+      btn.textContent = layout.label;
+      btn.className = layout.id === state.layout ? "active" : "";
+      btn.addEventListener("click", function () {
+        NeprofTheme.setLayout(layout.id);
+        state = NeprofTheme.getState();
+        renderLayoutChoices();
+        renderPreview();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  function renderSliders() {
+    var wrap = document.getElementById("sliders");
+    wrap.innerHTML = "";
+    NeprofTheme.SLIDERS.forEach(function (s) {
+      var row = document.createElement("div");
+      row.className = "slider-row";
+
+      var label = document.createElement("label");
+      var valueSpan = document.createElement("span");
+      valueSpan.textContent = state.vars[s.key] + s.unit;
+      label.textContent = s.label + " ";
+      label.appendChild(valueSpan);
+
+      var input = document.createElement("input");
+      input.type = "range";
+      input.min = s.min;
+      input.max = s.max;
+      input.step = s.step;
+      input.value = state.vars[s.key];
+
+      // realtime: každý pohyb slideru (input event) hned aplikuje CSS proměnnou
+      input.addEventListener("input", function () {
+        var val = parseFloat(input.value);
+        NeprofTheme.setVar(s.key, val);
+        valueSpan.textContent = val + s.unit;
+      });
+
+      row.appendChild(label);
+      row.appendChild(input);
+      wrap.appendChild(row);
+    });
+  }
+
+  function defaultContent() {
+    return (
+      '<div class="surface preview-card"><h3>Náhled — karta místnosti</h3>' +
+      '<p class="muted">Toto je ukázkový obsah, který reaguje na slidery a zvolený layout v reálném čase.</p>' +
+      '<button class="btn">Vstoupit do místnosti</button></div>' +
+      '<div class="surface preview-card"><h3>Náhled — profilová karta</h3>' +
+      '<p class="muted">Font, mezery, zaoblení a barva se mění okamžitě při posunu slideru — bez reloadu stránky.</p></div>'
+    );
+  }
+
+  function defaultSidebar() {
+    return (
+      '<div class="demo-list-item active">Obecná místnost</div>' +
+      '<div class="demo-list-item">Deník tvůrců</div>' +
+      '<div class="demo-list-item">Piškvorky — turnaj</div>'
+    );
+  }
+
+  function renderPreview() {
+    var content = document.getElementById("app-content");
+    var sidebar = document.getElementById("app-sidebar");
+    sidebar.innerHTML = defaultSidebar();
+    content.innerHTML = defaultContent();
+
+    if (state.layout === "layout-feed-cards") {
+      content.innerHTML =
+        '<div class="feed-card"><div class="feed-card-avatar">●</div>' +
+        '<div class="feed-card-line accent"></div><div class="feed-card-line"></div>' +
+        '<div class="feed-card-line" style="width:60%"></div></div>' +
+        '<div class="feed-card"><div class="feed-card-avatar">●</div>' +
+        '<div class="feed-card-line accent"></div><div class="feed-card-line"></div></div>' +
+        '<div class="feed-card"><div class="feed-card-avatar">●</div>' +
+        '<div class="feed-card-line accent"></div><div class="feed-card-line"></div>' +
+        '<div class="feed-card-line" style="width:50%"></div></div>';
+    } else if (state.layout === "layout-grid-gallery") {
+      var labels = ["Elegant Room", "Cozy Corner", "Cozy Corner", "Blatyil Room", "Cozy Corner", "Elegant Room"];
+      var html = '<h2 class="panel-heading">Room</h2><div class="gallery-grid">';
+      labels.forEach(function (label) {
+        html += '<div class="gallery-card"><span class="badge">⚙</span><span class="label">' + label + '</span></div>';
+      });
+      content.innerHTML = html + "</div>";
+    } else if (state.layout === "layout-split-view") {
+      sidebar.innerHTML =
+        '<div class="demo-list-item active">Anna — Ahoj, jak to jde?</div>' +
+        '<div class="demo-list-item">Tomáš — Zítra místnost?</div>' +
+        '<div class="demo-list-item">Klára — Díky za pozvánku</div>' +
+        '<div class="demo-list-item">Petr — 👍</div>';
+      content.innerHTML =
+        '<div class="surface preview-card"><h3>Anna</h3>' +
+        '<p class="muted">Ahoj, jak to jde? Připojíš se dnes do místnosti?</p></div>' +
+        '<div class="surface preview-card"><p class="muted">Detail konverzace se mění podle výběru v levém panelu.</p></div>';
+    } else if (state.layout === "layout-kanban") {
+      var columns = [
+        { title: "Návrh", cards: ["Feed karet", "Galerie/grid"] },
+        { title: "Rozpracováno", cards: ["Split-view", "Kanban"] },
+        { title: "Hotovo", cards: ["Sidebar vlevo", "Sidebar vpravo", "Horní lišta"] },
+      ];
+      var kb = '<div class="kanban-board">';
+      columns.forEach(function (col) {
+        kb += '<div class="kanban-column"><h4>' + col.title + '</h4>';
+        col.cards.forEach(function (c) { kb += '<div class="kanban-card">' + c + '</div>'; });
+        kb += '</div>';
+      });
+      content.innerHTML = kb + '</div>';
+    } else if (state.layout === "layout-magazine") {
+      content.innerHTML =
+        '<div class="magazine-hero"><h2>Týden na Neprofesionálech</h2>' +
+        '<p>Nejsledovanější místnosti a živé aukce tohoto týdne.</p></div>' +
+        '<div class="magazine-grid">' +
+        '<div class="surface"><h3>Elegant Room</h3><p class="muted">Živá aukce končí za 2h</p></div>' +
+        '<div class="surface"><h3>Piškvorky turnaj</h3><p class="muted">4 hráči čekají</p></div>' +
+        '<div class="surface"><h3>Cozy Corner</h3><p class="muted">128 členů</p></div>' +
+        '</div>';
+    }
+  }
+
+  document.getElementById("reset-btn").addEventListener("click", function () {
+    state = NeprofTheme.resetToDefault();
+    renderLayoutChoices();
+    renderSliders();
+    renderPreview();
+  });
+
+  renderLayoutChoices();
+  renderSliders();
+  renderPreview();
+})();
+</script>
+</body>
+</html>
