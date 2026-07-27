@@ -151,6 +151,8 @@ se jich jen úkoly, které mění autentizaci, práva nebo routing napříč app
 - `frontend/profil-events.js`
 - `frontend/profil-media.js`
 - `frontend/profil-contact.js`
+- `frontend/profil-locations.js` (správa vlastních lokalit — max 3, backend
+  z v27 přes `app/routers/profile.py:/me/locations`)
 - `frontend/profil-wall-activity.js`
 - `frontend/profil.css`
 - → **vzorový modulární rozpad, používat i jinde**

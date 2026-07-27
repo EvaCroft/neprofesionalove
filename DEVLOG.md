@@ -28,6 +28,11 @@
 - `PUT /profile/me/sensitive` vyžaduje `current_password`. Mění: `email_secondary`, `phone_secondary`, `birth_date`, `address`.
 - Konstanta `ALWAYS_PRIVATE_FIELDS` na backendu striktně blokuje veřejné čtení těchto 4 polí.
 
+### ✅ Dokončeno: Správa lokalit na vlastním profilu (backlog bod 4, #051)
+- Backend (`app/models/profile_location.py`, `GET/POST/PUT/DELETE /profile/me/locations`) existoval už z v27 kvůli zobrazení lokalit na veřejném profilu — chybělo jen UI pro správu na vlastním profilu.
+- Nové: sekce "Lokality" v kartě "O mně" na `layout-user-profil.html` (nahradila placeholder), modal pro přidání/úpravu, nový `frontend/profil-locations.js`.
+- Limit **3 lokalit** (label + město + země + popis) vynucen frontendem — backend limit nemá.
+
 ---
 
 ## 2. Přehled otevřeného backlogu (Aktivní)

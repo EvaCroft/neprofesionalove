@@ -133,7 +133,15 @@ if (!localStorage.getItem('np_token')) { window.location.replace('layout-auth.ht
     <div class="card">
       <h3>O mně</h3>
       <div class="info-row" id="info-presence-row"><span class="dotc" id="presence-dot" style="background:var(--text-3);"></span><span id="info-presence">Zjišťuji stav —</span></div>
-      <div class="info-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0116 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="color:var(--text-3);">Lokace a zájmy — brzy</span></div>
+      <div style="margin-top:6px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <span style="font-size:.72rem; color:var(--text-3); text-transform:uppercase; letter-spacing:.03em;">Lokality</span>
+          <button class="profile-btn ghost" id="btn-add-location" style="padding:2px 10px; font-size:.7rem;" onclick="openAddLocation()">+ Přidat</button>
+        </div>
+        <div id="locations-list" style="margin-top:6px;">
+          <span style="color:var(--text-3); font-size:.8rem;">Zatím žádné lokality.</span>
+        </div>
+      </div>
       <div class="info-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="info-member-since">Členka od —</span></div>
       <div class="info-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M14 12h.01M17 12h.01"/></svg><span id="info-referral">Referral kód: —</span></div>
       <div class="info-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg><span id="info-education">Vzdělání: nechci uvádět</span></div>
@@ -487,12 +495,41 @@ if (!localStorage.getItem('np_token')) { window.location.replace('layout-auth.ht
   </div>
 </div>
 
+<div class="modal-overlay" id="location-form-overlay">
+  <div class="modal-card">
+    <h3 id="location-form-title">Přidat lokalitu</h3>
+    <p style="color:var(--text-3); font-size:.78rem; margin:-4px 0 10px;">Max. 3 lokality (např. Domov, Práce, Chalupa). Viditelné i na veřejném profilu.</p>
+    <div id="location-form-msg" class="form-msg"></div>
+    <div class="field">
+      <label for="location-label">Název (nepovinné)</label>
+      <input type="text" id="location-label" placeholder="Domov, Práce, Chalupa na horách…">
+    </div>
+    <div class="field">
+      <label for="location-city">Město</label>
+      <input type="text" id="location-city" placeholder="Praha">
+    </div>
+    <div class="field">
+      <label for="location-country">Země (nepovinné)</label>
+      <input type="text" id="location-country" placeholder="Česko">
+    </div>
+    <div class="field">
+      <label for="location-description">Popis (nepovinné)</label>
+      <textarea id="location-description" rows="2" maxlength="280" placeholder="Pár slov o tomhle místě…" style="width:100%; padding:12px 14px; border-radius:14px; border:.5px solid var(--hairline); background:var(--bg); color:var(--text-1); font-family:inherit; font-size:.9rem; outline:none; resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:6px;">
+      <button class="profile-btn ghost" style="flex:1; justify-content:center;" onclick="closeLocationForm()">Zrušit</button>
+      <button class="profile-btn primary" style="flex:1; justify-content:center;" id="save-location-btn" onclick="saveLocationForm()">Uložit</button>
+    </div>
+  </div>
+</div>
+
 <script src="media-shared.js"></script>
 <script src="posts-shared.js"></script>
 <script src="profil-core.js"></script>
 <script src="profil-badges.js"></script>
 <script src="profil-friends.js"></script>
 <script src="profil-contact.js"></script>
+<script src="profil-locations.js"></script>
 <script src="profil-media.js"></script>
 <script src="profil-events.js"></script>
 <script src="profil-ui.js"></script>

@@ -146,6 +146,9 @@ async function loadProfileData(){
         document.getElementById('info-sexual-preference-row').style.display = '';
       }
       document.getElementById('info-phone').textContent = p.phone ? p.phone : 'Telefon zatím nevyplněn';
+
+      // v27 backend (lokality) + backlog bod 4 (UI) - viz profil-locations.js
+      renderLocationsList(p.locations || []);
     }
 
     if(walletRes.ok){
