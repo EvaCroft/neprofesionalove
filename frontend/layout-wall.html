@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<!-- Template: moonGlass-v1 (glass/Apple-styl vizuální design appky Neprofesionálové) -->
+<html lang="cs" data-template="moonGlass-v1"><head><meta charset="UTF-8"><title>Neprofesionálové — Zeď</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#F5F5F7; --surface:rgba(255,255,255,0.65); --surface-solid:#FFFFFF;
+  --text-1:#1D1D1F; --text-2:#6E6E73; --text-3:#A1A1A6; --hairline:rgba(0,0,0,0.08);
+  --accent:#635BFF; --accent-b:#FF6FB8; --accent-c:#4FD1FF; --accent-soft:rgba(99,91,255,0.12);
+  --shadow:0 24px 70px rgba(0,0,0,0.09); --radius:26px; --font-active:var(--font-sans);
+  --font-sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter",Helvetica,Arial,sans-serif;
+  --font-serif:"Fraunces",Georgia,serif; --font-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+[data-mode="dark"] {
+  --bg:#000000; --surface:rgba(28,28,30,0.55); --surface-solid:#1C1C1E;
+  --text-1:#F5F5F7; --text-2:#98989D; --text-3:#6E6E73; --hairline:rgba(255,255,255,0.09);
+  --accent-soft:rgba(139,133,255,0.16); --shadow:0 24px 70px rgba(0,0,0,0.55);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { -webkit-font-smoothing:antialiased; font-size:16px; }
+body { background:var(--bg); color:var(--text-1); font-family:var(--font-active); transition:background .4s,color .4s; min-height:100vh; }
+a { color:inherit; }
+.orb { position:fixed; top:-220px; left:50%; transform:translateX(-50%); width:1000px; height:1000px; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, var(--accent) 0%, transparent 55%),radial-gradient(circle at 70% 60%, var(--accent-b) 0%, transparent 50%),radial-gradient(circle at 50% 80%, var(--accent-c) 0%, transparent 50%);
+  opacity:.28; filter:blur(70px); animation:drift 14s ease-in-out infinite alternate; pointer-events:none; z-index:0; }
+[data-mode="dark"] .orb { opacity:.2; }
+@keyframes drift { 0%{transform:translateX(-52%) translateY(0) scale(1);} 100%{transform:translateX(-48%) translateY(24px) scale(1.05);} }
+
+.panel-brand { height:64px; box-sizing:border-box; background:var(--surface); backdrop-filter:blur(22px) saturate(180%); -webkit-backdrop-filter:blur(22px) saturate(180%); border:.5px solid var(--hairline); border-radius:22px; padding:10px 20px; flex-shrink:0; display:flex; flex-direction:column; justify-content:center; gap:6px; }
+.brand-row { display:flex; align-items:center; gap:8px; }
+.brand { font-weight:700; font-size:.95rem; letter-spacing:-.2px; }
+.badge { font-family:var(--font-mono); font-size:.62rem; letter-spacing:.4px; color:var(--accent); background:var(--accent-soft); padding:3px 8px; border-radius:100px; font-weight:500; }
+.stat-ticker { position:relative; height:14px; overflow:hidden; }
+.stat-ticker .stat-item { position:absolute; top:0; left:0; display:flex; align-items:center; gap:5px; font-size:.66rem; color:var(--text-2); font-family:var(--font-mono); white-space:nowrap; width:100%; }
+.dotc { width:6px; height:6px; border-radius:50%; display:inline-block; }
+.dot-green { background:#34C759; }
+
+.panel-search { flex:1; position:relative; height:64px; box-sizing:border-box; background:var(--surface); backdrop-filter:blur(22px) saturate(180%); -webkit-backdrop-filter:blur(22px) saturate(180%); border:.5px solid var(--hairline); border-radius:100px; padding:0 22px; display:flex; align-items:center; gap:10px; }
+.panel-search svg { width:17px; height:17px; stroke:var(--text-3); flex-shrink:0; }
+.panel-search input { flex:1; border:none; background:transparent; outline:none; font-size:.9rem; color:var(--text-1); font-family:inherit; }
+
+.panel-icons { display:flex; gap:6px; height:64px; box-sizing:border-box; background:var(--surface); backdrop-filter:blur(22px) saturate(180%); -webkit-backdrop-filter:blur(22px) saturate(180%); border:.5px solid var(--hairline); border-radius:100px; padding:0 10px; flex-shrink:0; align-items:center; position:relative; }
+.icon-btn { position:relative; width:38px; height:38px; border-radius:50%; border:none; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.icon-btn:hover { background:var(--accent-soft); }
+.icon-btn svg { width:18px; height:18px; stroke:var(--text-1); }
+.icon-btn.active { background:var(--accent-soft); }
+.icon-btn.active svg { stroke:var(--accent); }
+
+.panel-quick { display:flex; gap:6px; height:64px; box-sizing:border-box; background:var(--surface); backdrop-filter:blur(22px) saturate(180%); -webkit-backdrop-filter:blur(22px) saturate(180%); border:.5px solid var(--hairline); border-radius:100px; padding:0 10px; flex-shrink:0; align-items:center; }
+
+.app-header { position:sticky; top:0; z-index:40; width:100%; background:var(--surface); backdrop-filter:blur(10px) saturate(0%); -webkit-backdrop-filter:blur(10px) saturate(0%); padding:20px 0 16px; border-bottom:.5px solid var(--hairline); }
+.topbar { max-width:1200px; margin:0 auto; display:flex; align-items:stretch; gap:12px; padding:0 24px; }
+.page-nav-container { max-width:1200px; margin:14px auto 0; padding:0 24px; display:flex; }
+.page-nav-inner { display:flex; gap:3px; background:var(--surface-solid); border:.5px solid var(--hairline); border-radius:100px; padding:6px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; }
+.page-nav-inner::-webkit-scrollbar { display:none; width:0; height:0; }
+.page-nav-container a { padding:9px 18px; border-radius:100px; font-size:.83rem; font-weight:500; color:var(--text-2); text-decoration:none; white-space:nowrap; transition:background .2s,color .2s; }
+.page-nav-container a:hover:not(.active) { background:var(--accent-soft); color:var(--accent); }
+.page-nav-container a.active { background:var(--accent); color:#fff; }
+.page-nav-container a.soon { opacity:.4; pointer-events:none; }
+
+main { position:relative; z-index:1; max-width:700px; margin:0 auto; padding:32px 24px 100px; }
+
+.card { background:var(--surface); backdrop-filter:blur(20px) saturate(180%); border:.5px solid var(--hairline); border-radius:var(--radius); padding:26px; }
+.card h3 { font-size:1rem; font-weight:600; margin-bottom:16px; }
+.pill-btn { background:var(--accent); color:#fff; border:none; border-radius:100px; padding:9px 18px; font-size:.78rem; font-weight:600; cursor:pointer; }
+.pill-btn:disabled { opacity:.45; cursor:default; }
+.pill-btn-ghost { background:var(--accent-soft); color:var(--accent); border:none; border-radius:100px; padding:7px 14px; font-size:.72rem; font-weight:600; cursor:pointer; }
+</style>
+
+<style>
+/* ===== ZEĎ ===== */
+.wall-head { margin-bottom:20px; }
+.wall-head h1 { font-size:1.5rem; font-weight:600; letter-spacing:-.4px; }
+.wall-head p { font-size:.85rem; color:var(--text-2); margin-top:4px; }
+
+.composer { margin-bottom:22px; }
+.composer textarea { width:100%; min-height:64px; border:none; background:transparent; resize:vertical; outline:none; font-family:inherit; font-size:.9rem; color:var(--text-1); }
+.composer textarea::placeholder { color:var(--text-3); }
+.composer-foot { display:flex; align-items:center; justify-content:space-between; margin-top:12px; padding-top:12px; border-top:.5px solid var(--hairline); }
+.vis-select { position:relative; }
+.vis-select select { appearance:none; -webkit-appearance:none; background:var(--surface-solid); border:.5px solid var(--hairline); border-radius:100px; padding:7px 30px 7px 14px; font-size:.74rem; font-weight:500; color:var(--text-1); font-family:inherit; cursor:pointer; outline:none; }
+.vis-select svg { position:absolute; right:10px; top:50%; transform:translateY(-50%); width:11px; height:11px; stroke:var(--text-3); pointer-events:none; }
+
+.settings-toggle { display:flex; align-items:center; gap:6px; font-size:.72rem; color:var(--text-2); cursor:pointer; background:none; border:none; padding:4px 0; }
+.settings-toggle svg { width:13px; height:13px; stroke:var(--text-3); }
+.wall-settings { display:none; margin-top:14px; padding-top:14px; border-top:.5px solid var(--hairline); }
+.wall-settings.open { display:block; }
+.wall-settings-row { display:flex; align-items:center; justify-content:space-between; padding:6px 0; font-size:.82rem; }
+.switch { position:relative; width:38px; height:22px; border-radius:100px; background:var(--hairline); border:none; cursor:pointer; flex-shrink:0; transition:background .15s; }
+.switch.on { background:var(--accent); }
+.switch::after { content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform .15s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.switch.on::after { transform:translateX(16px); }
+
+.feed { display:flex; flex-direction:column; gap:14px; }
+.post-card { padding:20px; }
+.post-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.post-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-b)); flex-shrink:0; }
+.post-meta { flex:1; min-width:0; }
+.post-meta b { font-size:.85rem; display:block; }
+.post-meta span { font-size:.7rem; color:var(--text-2); font-family:var(--font-mono); display:flex; align-items:center; gap:5px; }
+.vis-chip { font-size:.62rem; padding:2px 8px; border-radius:100px; background:var(--accent-soft); color:var(--accent); font-weight:600; font-family:var(--font-sans); }
+.origin-chip { font-size:.62rem; color:var(--text-3); }
+.post-text { font-size:.88rem; line-height:1.5; white-space:pre-wrap; margin-bottom:10px; }
+.post-media { border-radius:16px; aspect-ratio:16/9; background:linear-gradient(135deg,var(--accent-c),var(--accent)); margin-bottom:6px; position:relative; overflow:hidden; }
+.post-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:4px; }
+.post-actions button { background:none; border:none; color:var(--text-3); font-size:.72rem; cursor:pointer; padding:4px 8px; border-radius:8px; }
+.post-actions button:hover { background:var(--accent-soft); color:var(--accent); }
+
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-2); }
+.empty-state svg { width:40px; height:40px; stroke:var(--text-3); margin-bottom:14px; }
+.empty-state h4 { font-size:.95rem; color:var(--text-1); margin-bottom:6px; }
+.empty-state p { font-size:.82rem; max-width:320px; margin:0 auto; }
+
+@media (max-width:640px) { main { padding:24px 16px 100px; } }
+</style>
+</head><body data-mode="light">
+<div class="orb"></div>
+<div class="app-header">
+
+<div class="topbar">
+  <div class="panel-brand">
+    <div class="brand-row"><span class="brand">Neprofesionálové</span><span class="badge">v0.1 · MVP</span></div>
+    <div class="stat-ticker"><div class="stat-item"><span class="dotc dot-green"></span>21 830 přihlášených</div></div>
+  </div>
+
+  <div class="panel-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" placeholder="Hledat na zdi…">
+  </div>
+
+  <div class="panel-icons">
+    <button class="icon-btn" aria-label="Notifikace">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Zprávy">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Uživatelské menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="page-nav-container"><div class="page-nav-inner">
+  <a href="layout-user-profil.html">Profil</a>
+  <a class="active" href="layout-wall.html">Zeď</a>
+  <a href="layout-messenger.html">Zprávy</a>
+  <a class="soon" href="#">Peněženka (brzy)</a>
+  <a href="layout-media-galerie.html">Média</a>
+  <a href="layout-chat-mistnost.html">Chat</a>
+  <a class="soon" href="#">Klubovny (brzy)</a>
+  <a class="soon" href="#">Události (brzy)</a>
+  <a class="soon" href="#">Hry (brzy)</a>
+</div></div>
+</div>
+
+<main>
+
+<div class="wall-head">
+  <h1 id="wall-title">Zeď</h1>
+  <p id="wall-sub">Co se právě děje.</p>
+</div>
+
+<div class="card composer" id="composer">
+  <textarea id="post-text" placeholder="Co se právě děje?"></textarea>
+  <div class="composer-foot">
+    <div class="vis-select">
+      <select id="post-visibility">
+        <option value="public">Veřejné</option>
+        <option value="friends">Jen přátelé</option>
+        <option value="private">Soukromé</option>
+      </select>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <button class="pill-btn" id="post-submit" onclick="submitPost()">Přidat příspěvek</button>
+  </div>
+
+  <button class="settings-toggle" onclick="toggleWallSettings()">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 01-4 0v-.09A1.7 1.7 0 009 19.4a1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.7 1.7 0 004.6 15a1.7 1.7 0 00-1.55-1H3a2 2 0 010-4h.09A1.7 1.7 0 004.6 9a1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06A1.7 1.7 0 009 4.6a1.7 1.7 0 001-1.55V3a2 2 0 014 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06A1.7 1.7 0 0019.4 9a1.7 1.7 0 001.55 1H21a2 2 0 010 4h-.09a1.7 1.7 0 00-1.51 1z"/></svg>
+    Co se propisuje na zeď automaticky
+  </button>
+  <div class="wall-settings" id="wall-settings"></div>
+</div>
+
+<div class="feed" id="feed"></div>
+
+<div class="empty-state" id="empty-state" style="display:none">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+  <h4>Zatím žádné příspěvky</h4>
+  <p>Jakmile něco napíšeš nebo nahraješ na zeď, objeví se to tady.</p>
+</div>
+
+</main>
+
+<script src="media-shared.js"></script>
+<script src="posts-shared.js"></script>
+<script>
+/* Auth guard - stejný vzor jako layout-user-profil.html; zeď smí prohlížet
+   i guest (bez tokenu) - ale composer a nastavení propisu vyžadují přihlášení. */
+const NP_TOKEN = localStorage.getItem('np_token');
+const authHeaders = NP_TOKEN ? { 'Authorization': 'Bearer ' + NP_TOKEN } : {};
+
+// VIS_LABEL, ACTION_LABEL, authorName() a fmtTime() jsou teď v posts-shared.js.
+const { VIS_LABEL, ACTION_LABEL, authorName } = PostsShared;
+
+// user_id ze query stringu (?user=5) = zeď jiného uživatele; jinak vlastní zeď
+// (moje user_id čteme z JWT payloadu, stejný vzor jako layout-user-profil.html).
+function myUserId() {
+  if (!NP_TOKEN) return null;
+  try { return parseInt(JSON.parse(atob(NP_TOKEN.split('.')[1])).sub, 10); }
+  catch { return null; }
+}
+const params = new URLSearchParams(window.location.search);
+const ME = myUserId();
+const WALL_USER_ID = params.get('user') ? parseInt(params.get('user'), 10) : ME;
+const IS_OWN_WALL = ME !== null && WALL_USER_ID === ME;
+
+// renderPost/loadWall/submitPost/deletePost jsou teď v posts-shared.js
+// (PostsShared.renderPostCard/loadWall/submitPost/deletePost), tahle stránka
+// jen doplňuje kontext dané stránky (nadpis zdi, viditelnost composeru, ...).
+function loadWall() {
+  const targetId = WALL_USER_ID || ME;
+  if (!targetId) { window.location.replace('layout-auth.html'); return; }
+
+  document.getElementById('wall-title').textContent = IS_OWN_WALL ? 'Moje zeď' : `Zeď uživatele`;
+  if (!IS_OWN_WALL) authorName(targetId, authHeaders).then(name => { document.getElementById('wall-title').textContent = `Zeď — ${name}`; });
+  document.getElementById('composer').style.display = (NP_TOKEN) ? '' : 'none';
+
+  return PostsShared.loadWall({
+    targetUserId: targetId,
+    feedEl: document.getElementById('feed'),
+    emptyEl: document.getElementById('empty-state'),
+    authHeaders,
+    meId: ME,
+    onDelete: deletePost,
+    onMediaDeleted: loadWall,
+  });
+}
+
+function submitPost() {
+  return PostsShared.submitPost({
+    textEl: document.getElementById('post-text'),
+    visibilityEl: document.getElementById('post-visibility'),
+    submitBtn: document.getElementById('post-submit'),
+    authHeaders,
+    targetUserId: IS_OWN_WALL ? null : WALL_USER_ID,
+    onSuccess: loadWall,
+  });
+}
+
+function deletePost(id) {
+  return PostsShared.deletePost(id, { authHeaders, onSuccess: loadWall });
+}
+
+let wallSettingsLoaded = false;
+
+function toggleWallSettings() {
+  const box = document.getElementById('wall-settings');
+  box.classList.toggle('open');
+  if (box.classList.contains('open') && !wallSettingsLoaded) loadWallSettings();
+}
+
+async function loadWallSettings() {
+  const res = await fetch('/posts/settings/me', { headers: authHeaders });
+  if (!res.ok) return;
+  const data = await res.json();
+  wallSettingsLoaded = true;
+  const box = document.getElementById('wall-settings');
+  box.innerHTML = '';
+  Object.entries(data.auto_post_actions).forEach(([key, enabled]) => {
+    const row = document.createElement('div');
+    row.className = 'wall-settings-row';
+    row.innerHTML = `<span>${ACTION_LABEL[key] || key}</span>`;
+    const sw = document.createElement('button');
+    sw.className = 'switch' + (enabled ? ' on' : '');
+    sw.onclick = () => toggleAction(key, sw);
+    row.appendChild(sw);
+    box.appendChild(row);
+  });
+}
+
+async function toggleAction(key, btn) {
+  const next = !btn.classList.contains('on');
+  btn.classList.toggle('on', next);
+  await fetch('/posts/settings/me', {
+    method: 'PUT',
+    headers: { ...authHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ actions: { [key]: next } }),
+  });
+}
+
+loadWall();
+</script>
+</body></html>

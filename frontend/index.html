@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; url=layout-auth.html">
+<title>Neprofesionálové</title>
+</head>
+<body>
+  <p>Přesměrovávám…</p>
+  <script>
+    var dest = localStorage.getItem("np_token") ? "layout-dashboard.html" : "layout-auth.html";
+    window.location.replace(dest);
+  </script>
+</body>
+</html>
