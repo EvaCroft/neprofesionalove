@@ -1,15 +1,16 @@
 # DEVLOG (Active) – Neprofesionálové
 
 **Projekt:** Neprofesionálové  
-**Aktuální verze:** v27 ✅ HOTOVO — "O mně" & Veřejný profil (vlastní i cizí).  
+**Aktuální verze:** v28a ✅ HOTOVO — Moje statistiky (herní/event/media čísla).  
 **Stav bloku Profil/Vztahy:**
 - **v27 ✅ HOTOVO:** "O mně" + Přátelé na VLASTNÍM profilu (#048). Veřejný profil `layout-profil-verejny.html` + `profil-verejny.js` (kostra, napojení na data, skrytí `ALWAYS_PRIVATE_FIELDS`, tlačítka Přidat do přátel / Sledovat) — v27a/b/c dokončeny v jednom kroku, backend endpointy (`friends.py`, `profile.py`) už existovaly, žádná backend úprava nebyla potřeba (#050).
-- **v28 🔄 NEZAHÁJENO:** "Moje statistiky" + komunitní widgety na Přehledu.
+- **v28a ✅ HOTOVO:** "Statistiky" → "Moje statistiky" + herní/event/media čísla (#052).
+- **v28b 🔄 NEZAHÁJENO:** Komunitní widgety na Přehledu.
 - **v29 ✅ HOTOVO:** Osobní údaje (vzdělání, náboženství, sexuální preference) + kontakty přes `PUT /profile/me/sensitive` chráněné heslem (#049).
 
 **Stav bloku Frontend / Design:**
 - Hotové reálné stránky: `layout-dashboard.html`, `layout-auth.html`, `layout-user-profil.html`, `layout-wall.html`, `layout-media-galerie.html`, `layout-profil-verejny.html`.
-- **Zbývá / Další krok:** 1. v28 – Moje statistiky & widgety.
+- **Zbývá / Další krok:** 1. v28b – Komunitní widgety na Přehledu.
   2. Frontend pro Chat místnosti + Messenger (`layout-chat-mistnost.html`, `layout-messenger.html`).
 
 ---
@@ -32,6 +33,14 @@
 - Backend (`app/models/profile_location.py`, `GET/POST/PUT/DELETE /profile/me/locations`) existoval už z v27 kvůli zobrazení lokalit na veřejném profilu — chybělo jen UI pro správu na vlastním profilu.
 - Nové: sekce "Lokality" v kartě "O mně" na `layout-user-profil.html` (nahradila placeholder), modal pro přidání/úpravu, nový `frontend/profil-locations.js`.
 - Limit **3 lokalit** (label + město + země + popis) vynucen frontendem — backend limit nemá.
+
+### ✅ Dokončeno: v28a – Moje statistiky (#052)
+- "Statistiky" → "Moje statistiky" na `layout-user-profil.html`.
+- `GET /profile/me` rozšířen o `games_count`, `events_count`, `media_count` — transientní (nepersistované) atributy dopočítané v `read_my_profile()`, čtou jen existující tabulky `games`/`event_participations`/`media_assets`, žádná DB migrace.
+  - `games_count`: dokončené (`FINISHED`) hry, kde uživatel hrál přímo (`player1_id`/`player2_id`) nebo jako člen týmu (`GameTeamPlayer`), distinct.
+  - `events_count`: distinct událostí s jakoukoliv účastí (`GOING`/`INTERESTED`/`WENT`).
+  - `media_count`: veškerá média nahraná uživatelem (`MediaAsset.owner_id`), bez ohledu na zdroj.
+- Cizí (veřejný) profil tato čísla nepočítá, zůstávají na výchozí 0 — smysl dávají jen na vlastním profilu.
 
 ---
 

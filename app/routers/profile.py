@@ -10,6 +10,11 @@ from app.models.log import LogType
 from app.models.profile import Profile, VISIBILITY_CONTROLLED_FIELDS, ALWAYS_PRIVATE_FIELDS
 from app.models.profile_location import ProfileLocation
 from app.models.user import User
+# v28a - "Moje statistiky": jen ke čtení modelů jiných domén pro souhrnná
+# čísla, žádné úpravy games.py/events.py/media.py samotných.
+from app.models.game import Game, GameStatus, GameTeamPlayer
+from app.models.event import EventParticipation
+from app.models.media import MediaAsset
 from app.permissions import require_role
 from app.models.user import RoleEnum
 from app.routers.posts import get_current_user_optional
@@ -71,12 +76,55 @@ def _get_or_create_profile(db: Session, user_id: int) -> Profile:
     return profile
 
 
+def _count_games_played(db: Session, user_id: int) -> int:
+    """Dokončené hry (FINISHED), kde uživatel hrál - přímo (1v1,
+    player1_id/player2_id) nebo jako člen týmu (team_tic_tac_toe,
+    GameTeamPlayer). Počítáme distinct game.id, ať se hra nezapočítá
+    dvakrát, kdyby byl uživatel omylem v obou zdrojích."""
+    direct_ids = {
+        row[0] for row in db.query(Game.id).filter(
+            Game.status == GameStatus.FINISHED,
+            (Game.player1_id == user_id) | (Game.player2_id == user_id),
+        ).all()
+    }
+    team_ids = {
+        row[0] for row in db.query(GameTeamPlayer.game_id).join(
+            Game, Game.id == GameTeamPlayer.game_id
+        ).filter(
+            GameTeamPlayer.user_id == user_id,
+            Game.status == GameStatus.FINISHED,
+        ).all()
+    }
+    return len(direct_ids | team_ids)
+
+
+def _count_events(db: Session, user_id: int) -> int:
+    """Počet událostí, ke kterým má uživatel jakoukoliv účast (GOING/
+    INTERESTED/WENT) - distinct event_id, ať se stejná událost nepočítá
+    víckrát při případné změně stavu účasti v historii."""
+    return db.query(EventParticipation.event_id).filter(
+        EventParticipation.user_id == user_id
+    ).distinct().count()
+
+
+def _count_media(db: Session, user_id: int) -> int:
+    """Veškerá média nahraná uživatelem (owner_id), bez ohledu na zdroj
+    (zeď, galerie, messenger, room, avatar/cover, event cover)."""
+    return db.query(MediaAsset).filter(MediaAsset.owner_id == user_id).count()
+
+
 @router.get("/me", response_model=ProfileOut)
 def read_my_profile(
     current_user: User = Depends(require_role(RoleEnum.USER)),
     db: Session = Depends(get_db),
 ):
-    return _get_or_create_profile(db, current_user.id)
+    profile = _get_or_create_profile(db, current_user.id)
+    # Transientní atributy (nejsou to DB sloupce Profile) - Pydantic je
+    # přečte přes from_attributes stejně jako běžné kolonky.
+    profile.games_count = _count_games_played(db, current_user.id)
+    profile.events_count = _count_events(db, current_user.id)
+    profile.media_count = _count_media(db, current_user.id)
+    return profile
 
 
 @router.put("/me", response_model=ProfileOut)

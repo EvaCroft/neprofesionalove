@@ -1,7 +1,7 @@
 # BUILDPLAN_core (Active) – Neprofesionálové
 
-**Aktuální verze:** v27 ✅ HOTOVO
-**Aktivní blok:** v28 — Moje statistiky & Komunitní widgety
+**Aktuální verze:** v28a ✅ HOTOVO
+**Aktivní blok:** v28b — Komunitní widgety na Přehledu
 
 > Tento soubor pokrývá hlavní appku (ne admin — viz `BUILDPLAN_admin.md`,
 > ne backlog nápadů — viz `BUILDPLAN_backlog.md`). Nová session pro
@@ -25,9 +25,10 @@
   - [x] **v27c — Akční tlačítka Přidat do přátel / Sledovat** — HOTOVO.
     - Tlačítka v `profil-verejny.js` volají existující v24 endpointy (`/friends/request`, `/accept`, `/cancel`, `/decline`, `/{id}`, `/follow/{id}`) a čtou stav z `GET /friends/status/{id}` — endpoint už existoval, žádná backend úprava nebyla potřeba.
 - [ ] 🔄 **v28 — Moje statistiky & Komunitní widgety:**
-  - [ ] **v28a — Přejmenování a rozšíření vlastních statistik**
-    - Cíl: "Statistiky" → "Moje statistiky" na vlastním profilu + herní/event/media čísla.
-    - Soubory: `frontend/layout-user-profil.html`, `frontend/profil-ui.js`, `app/routers/profile.py` (rozšíření response o počty her/eventů/médií — zdroje dat: `app/routers/games.py`, `app/routers/events.py`, `app/routers/media.py` jen ke čtení modelů, ne k úpravě).
+  - [x] **v28a — Přejmenování a rozšíření vlastních statistik** — HOTOVO.
+    - "Statistiky" → "Moje statistiky" na `layout-user-profil.html`.
+    - `GET /profile/me` nově vrací `games_count` (dokončené hry, 1v1 i týmové), `events_count` (distinct účasti), `media_count` (vše nahrané uživatelem) — transientní hodnoty dopočítané v `app/routers/profile.py`, žádná DB migrace, jen čtení `games.py`/`events.py`/`media.py` modelů.
+    - Veřejný profil (`read_public_profile`) tato čísla nepočítá, zůstávají na výchozí 0 (schéma je sdílené, ale pole má smysl jen na vlastním profilu).
   - [ ] **v28b — Komunitní widgety na Přehledu**
     - Cíl: widgety (přátelé, přátelé přátel, klubovny, události, hry) na `layout-dashboard.html`.
     - Soubory: `frontend/layout-dashboard.html`, nový `frontend/dashboard-widgets.js` (nedávat inline — dashboard má už 51 řádků inline JS, nerozšiřovat je), `app/routers/friends.py`, `app/routers/rooms.py`, `app/routers/events.py`, `app/routers/games.py` (jen nové read-only endpointy pro souhrnná čísla, pokud chybí).
